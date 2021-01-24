@@ -87,7 +87,7 @@ func trimFileBy(file *os.File, count int) error {
 		seekPos += int64(n)
 	}
 
-	fileContent := make([]byte, seekPos-1)
+	fileContent := make([]byte, seekPos)
 	file.Seek(finfo.Size()-seekPos, os.SEEK_SET)
 	file.Read(fileContent)
 	os.Truncate(file.Name(), int64(0))
