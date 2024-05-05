@@ -8,7 +8,7 @@ other processes communicating through the logs files redirects stdin && stderr e
 
 ##### sample usage
 ```
-run go build.
+run 'go build -o logripper'
 
 logripper -n 100 -path /path/  --> trim all files in the folder to the last 100 lines
 
