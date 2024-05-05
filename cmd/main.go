@@ -22,12 +22,12 @@ func init() {
 }
 
 func main() {
-	if len(*logFilePath) <= 0   {
+	if len(*logFilePath) <= 0 {
 		log.Println("Empty path . Aborting ")
 		return
 	}
 
-	if *linesLeft <= 0{
+	if *linesLeft <= 0 {
 		log.Println("Invalid Value for number of lines left")
 		return
 	}
@@ -43,7 +43,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-
 	if fileStat.IsDir() {
 
 		files, err := os.ReadDir(file.Name())
@@ -58,9 +57,9 @@ func main() {
 			}
 
 			if *extension != "" && !strings.HasSuffix(file.Name(), *extension) {
-				log.Printf("File %s extension does not match\n",file.Name())
+				log.Printf("File %s extension does not match\n", file.Name())
 			}
-			logripper.TrimFileBy(logripper.Options{File: f,Bufsize: bufSize,LinesLeft: int64(*linesLeft)})
+			logripper.TrimFileBy(logripper.Options{File: f, Bufsize: bufSize, LinesLeft: int64(*linesLeft)})
 		}
 	} else {
 		f, err := os.OpenFile(filePath, os.O_RDWR, 0755)
@@ -71,7 +70,6 @@ func main() {
 			log.Println("File extension does not match")
 		}
 
-		logripper.TrimFileBy(logripper.Options{File: f,Bufsize: bufSize,LinesLeft: int64(*linesLeft)})
+		logripper.TrimFileBy(logripper.Options{File: f, Bufsize: bufSize, LinesLeft: int64(*linesLeft)})
 	}
 }
-
