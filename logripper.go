@@ -13,9 +13,15 @@ type Options struct {
 	File      *os.File
 }
 
+func max(A, B int64) int64 {
+	if A > B {
+		return A
+	}
+	return B
+}
+
 func TrimFileBy(opt Options) error {
 
-	seekPos := opt.Bufsize
 	finfo, err := opt.File.Stat()
 	if err != nil {
 		return err
@@ -30,10 +36,19 @@ func TrimFileBy(opt Options) error {
 
 	buf := make([]byte, opt.Bufsize)
 	newLineCount := int64(0)
+	fileSeekPos := finfo.Size()
+	fileSize := finfo.Size()
 
 outer:
 	for newLineCount < opt.LinesLeft {
-		opt.File.Seek(finfo.Size()-int64(seekPos), io.SeekEnd)
+		if fileSize <= 0 {
+			break
+		}
+
+		_, err = opt.File.Seek(max(0, fileSeekPos-int64(opt.Bufsize)), io.SeekStart)
+		if err != nil {
+			break
+		}
 		n, err := opt.File.Read(buf)
 		if err != nil {
 			break
@@ -43,23 +58,25 @@ outer:
 				newLineCount++
 			}
 			if newLineCount >= opt.LinesLeft {
-				seekPos += int64(n - index)
-				_, err = tempFile.Seek(0, io.SeekStart)
-				if err != nil {
-					return err
-				}
-
-				_, err = tempFile.Write(buf[index+1 : n])
-				if err != nil {
-					return err
-				}
-
+				fileSeekPos -= int64(n - index)
+				fileSize -= int64(n - index)
 				break outer
 			}
 		}
-		seekPos += int64(n)
-		tempFile.Seek(0, io.SeekStart)
-		tempFile.Write(buf[:n])
+
+		fileSize -= int64(n)
+		fileSeekPos -= int64(n)
+	}
+
+	fileSeekPos = max(0, fileSeekPos)
+	_, err = opt.File.Seek(fileSeekPos, io.SeekStart)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(tempFile, opt.File)
+	if err != nil {
+		return err
 	}
 
 	err = tempFile.Close() // flush.
