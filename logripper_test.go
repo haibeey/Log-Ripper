@@ -75,10 +75,6 @@ func TestTrimFileBy(t *testing.T) {
 
 			if strings.TrimSpace(string(buf)) != strings.TrimSpace(strings.Join(strArr[len(strArr)-i:], "\n")) {
 
-				writeToFile(t, strings.TrimSpace(string(buf)), "a.text")
-				writeToFile(t, strings.TrimSpace(strings.Join(strArr[len(strArr)-i:], "\n")), "b.text")
-				writeToFile(t, str, "c.text")
-
 				t.Fatalf(
 					"File trimmed does not match expected result. Got (%s) expected (%s) index (%d)",
 					strings.TrimSpace(string(buf)),
